@@ -4,6 +4,9 @@ http://localhost:8000/currency-exchange/from/USD/to/INR
 Currency Conversion service
 http://localhost:8100/currency-conversion/from/USD/to/INR/quantity/10
 
+Log-request
+http://localhost:8003/log-requests
+
 Eureka
 http://localhost:8761
 
@@ -23,6 +26,6 @@ API Gateway (Below URL will work if you have added configuration in api gateway 
 http://localhost:8765/currency-exchange/from/USD/to/INR
 
 http://localhost:8765/currency-conversion/from/USD/to/INR/quantity/10
-http://localhost:8765/currency-conversion-feign/from/USD/to/INR/quantity/10
+    http://localhost:8765/currency-conversion-feign/from/USD/to/INR/quantity/10
 Below will actually redirect to currency-conversion-feign feign only as there is a route configured in gateway
 http://localhost:8765/currency-conversion-new/from/USD/to/INR/quantity/10
