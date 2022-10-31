@@ -1,7 +1,6 @@
 package com.in28minutes.microservices.currencyconversionservice;
 
 import com.in28minutes.microservices.currencyconversionservice.kafka.CurencyExchangeLogTopicProducer;
-import com.in28minutes.microservices.currencyconversionservice.kafka.KafkaProducerDemo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,9 +16,6 @@ public class CurrencyConversionController {
 
     @Autowired
     private CurrencyExchangeProxy currencyExchangeProxy;
-
-    @Autowired
-    private KafkaProducerDemo kafkaProducerDemo;
 
     @Autowired
     private CurencyExchangeLogTopicProducer curencyExchangeLogTopicProducer;

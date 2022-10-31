@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
     currency-exchange:
-      image: shivamec92/mmv2-currency-exchange-service:latest
+      image: shivamec92/mmv2-currency-exchange-service:0.0.1-SNAPSHOT
       mem_limit: 700m
       ports:
        - "8000:8000"
@@ -11,13 +11,14 @@ services:
       depends_on:
         - naming-server
       environment:
+        SPRING_KAFKA_BOOTSTRAPSERVERS: kafka:29092
         EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/eureka
         SPRING.ZIPKIN.BASEURL: http://zipkin-server:9411/
       extra_hosts:
         - "host.docker.internal:host-gateway"
         
     currency-conversion:
-      image: shivamec92/mmv2-currency-conversion-service:latest
+      image: shivamec92/mmv2-currency-conversion-service:0.0.1-SNAPSHOT
       mem_limit: 700m
       ports:
        - "8100:8100"
@@ -26,11 +27,26 @@ services:
       depends_on:
         - naming-server
       environment:
+        SPRING_KAFKA_BOOTSTRAPSERVERS: kafka:29092
         EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/eureka
         SPRING.ZIPKIN.BASEURL: http://zipkin-server:9411/
-        
+    
+    log-requests:
+      image: shivamec92/mmv2-log-requests:0.0.1-SNAPSHOT
+      mem_limit: 700m
+      ports:
+       - "8003:8003"
+      networks:
+        - currency-network
+      depends_on:
+        - naming-server
+      environment:
+        SPRING_KAFKA_BOOTSTRAPSERVERS: kafka:29092
+        EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/eureka
+        SPRING.ZIPKIN.BASEURL: http://zipkin-server:9411/
+    
     api-gateway:
-      image: shivamec92/mmv2-api-gateway:latest
+      image: shivamec92/mmv2-api-gateway:0.0.1-SNAPSHOT
       mem_limit: 700m
       ports:
        - "8765:8765"
@@ -43,7 +59,7 @@ services:
         SPRING.ZIPKIN.BASEURL: http://zipkin-server:9411/
      
     naming-server:
-      image: shivamec92/mmv2-naming-server:latest
+      image: shivamec92/mmv2-naming-server:0.0.1-SNAPSHOT
       mem_limit: 700m
       ports:
        - "8761:8761"
