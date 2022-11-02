@@ -28,4 +28,5 @@ http://localhost:8765/currency-exchange/from/USD/to/INR
 http://localhost:8765/currency-conversion/from/USD/to/INR/quantity/10
     http://localhost:8765/currency-conversion-feign/from/USD/to/INR/quantity/10
 Below will actually redirect to currency-conversion-feign feign only as there is a route configured in gateway
-http://localhost:8765/currency-conversion-new/from/USD/to/INR/quantity/10
+http://localhost:8765/currency-conversion-new/from/USD/to/INR/quantity/10 --> this will redirect to feign
+http://localhost:8765/currency-conversion-old/from/USD/to/INR/quantity/10 --> this is normal call

@@ -27,6 +27,7 @@ public class APIGatewayConfiguration {
                 .route(p -> p.path("/currency-conversion-feign/**").uri("lb://currency-conversion"))
                 //Below is used to rewite the path or change the rewritten path to actual path
                 .route(p -> p.path("/currency-conversion-new/**").filters(f -> f.rewritePath("/currency-conversion-new/", "/currency-conversion-feign/")).uri("lb://currency-conversion"))
+                .route(p -> p.path("/currency-conversion-old/**").filters(f -> f.rewritePath("/currency-conversion-old/", "/currency-conversion/")).uri("lb://currency-conversion"))
                 .build();
     }
 }
