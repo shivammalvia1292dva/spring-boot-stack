@@ -40,6 +40,24 @@ services:
         JAVA_OPTS: "$JAVA_OPTS -javaagent:/aws-opentelemetry-agent.jar -Dotel.resource.attributes=service.name=CurrencyConversion 
           -Dotel.exporter=otlp -Dotel.exporter.otlp.endpoint=http://host.docker.internal:4317"
     
+    log-request-chain:
+      image: shivamec92/mmv2-log-request-chain:0.0.1-SNAPSHOT
+      mem_limit: 700m
+      volumes:
+        - ./otel-jar/aws-opentelemetry-agent.jar:/aws-opentelemetry-agent.jar 
+      ports:
+       - "8004:8004"
+      networks:
+        - currency-network
+      depends_on:
+        - naming-server
+      environment:
+        SPRING_KAFKA_BOOTSTRAPSERVERS: kafka:29092
+        EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/eureka
+        SPRING.ZIPKIN.BASEURL: http://zipkin-server:9411/
+        JAVA_OPTS: "$JAVA_OPTS -javaagent:/aws-opentelemetry-agent.jar -Dotel.resource.attributes=service.name=LogRequestChain 
+          -Dotel.exporter=otlp -Dotel.exporter.otlp.endpoint=http://host.docker.internal:4317"
+          
     log-requests:
       image: shivamec92/mmv2-log-requests:0.0.1-SNAPSHOT
       mem_limit: 700m
