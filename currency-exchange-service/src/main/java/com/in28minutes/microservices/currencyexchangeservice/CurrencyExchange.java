@@ -1,11 +1,20 @@
 package com.in28minutes.microservices.currencyexchangeservice;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import java.math.BigDecimal;
 
+@Entity
 public class CurrencyExchange {
+    @Id
     private Long id;
+
+    @Column(name="currency_from")
     private String from;
+    @Column(name="currency_to")
     private String to;
+    private int conversionMultiple;
     private String environment;
 
     public String getEnvironment() {
@@ -23,7 +32,7 @@ public class CurrencyExchange {
         return id;
     }
 
-    public CurrencyExchange(Long id, String from, String to, BigDecimal conversionMultiple) {
+    public CurrencyExchange(Long id, String from, String to, int conversionMultiple) {
         this.id = id;
         this.from = from;
         this.to = to;
@@ -50,13 +59,12 @@ public class CurrencyExchange {
         this.to = to;
     }
 
-    public BigDecimal getConversionMultiple() {
+    public int getConversionMultiple() {
         return conversionMultiple;
     }
 
-    public void setConversionMultiple(BigDecimal conversionMultiple) {
+    public void setConversionMultiple(int conversionMultiple) {
         this.conversionMultiple = conversionMultiple;
     }
 
-    private BigDecimal conversionMultiple;
 }
