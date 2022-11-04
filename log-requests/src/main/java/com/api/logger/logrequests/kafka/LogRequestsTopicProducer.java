@@ -1,6 +1,5 @@
-package com.in28minutes.microservices.currencyconversionservice.kafka;
+package com.api.logger.logrequests.kafka;
 
-import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,9 +8,9 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CurencyExchangeLogTopicProducer {
+public class LogRequestsTopicProducer {
 
-    Logger logger = LoggerFactory.getLogger(CurencyExchangeLogTopicProducer.class);
+    Logger logger = LoggerFactory.getLogger(LogRequestsTopicProducer.class);
     @Value("${topic.name.producer}")
     private String topicName;
 
@@ -19,12 +18,8 @@ public class CurencyExchangeLogTopicProducer {
     private KafkaTemplate<String, String> kafkaTemplate;
 
     public void send(String message) {
-        ProducerRecord<String,String> producer = new ProducerRecord<>(topicName,message);
-        producer.headers().add("temp","super".getBytes());
         logger.info("Payload message sent to : {}" + message);
-        producer.headers();
-        kafkaTemplate.send(producer);
-
+        kafkaTemplate.send(topicName, message);
     }
 
 }

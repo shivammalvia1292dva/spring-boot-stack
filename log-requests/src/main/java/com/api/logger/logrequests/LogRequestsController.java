@@ -1,6 +1,7 @@
 package com.api.logger.logrequests;
 
 import com.api.logger.logrequests.kafka.LogRequestsTopicListener;
+import com.api.logger.logrequests.kafka.LogRequestsTopicProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,6 @@ public class LogRequestsController {
 
     @Autowired
     private LogRequestsTopicListener logRequestsTopicListener;
-
 
     @GetMapping("/log-requests")
     public List<String> retrieveLogRequests() {
