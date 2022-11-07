@@ -33,7 +33,7 @@ public class KafkaService2TopicListener {
         logger.debug(parentSpan.getSpanContext().getSpanId());
 
 
-        Span childSpan = tracer.spanBuilder("kafka-service2-consumer").setParent(Context.current().with(parentSpan)).startSpan();
+        Span childSpan = tracer.spanBuilder("kafka-service2-topic-consumer").setParent(Context.current().with(parentSpan)).startSpan();
         logger.debug(childSpan.getSpanContext().getTraceId());
         logger.debug(childSpan.getSpanContext().getSpanId());
         // Make the span the current span
