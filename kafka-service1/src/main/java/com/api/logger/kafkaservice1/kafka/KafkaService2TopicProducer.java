@@ -8,9 +8,9 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
-public class KafkaService1TopicProducer {
+public class KafkaService2TopicProducer {
 
-    Logger logger = LoggerFactory.getLogger(KafkaService1TopicProducer.class);
+    Logger logger = LoggerFactory.getLogger(KafkaService2TopicProducer.class);
     @Value("${topic.name.producer}")
     private String topicName;
 

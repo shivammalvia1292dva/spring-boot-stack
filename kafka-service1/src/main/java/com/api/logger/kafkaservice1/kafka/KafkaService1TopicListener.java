@@ -21,7 +21,7 @@ import io.opentelemetry.context.Scope;
 public class KafkaService1TopicListener {
 
 	@Autowired
-	private KafkaService1TopicProducer logRequestsTopicProducer;
+	private KafkaService2TopicProducer kafkaService2TopicProducer;
 
 	Logger logger = LoggerFactory.getLogger(KafkaService1TopicListener.class);
 	@Value("${topic.name.consumer")
@@ -32,7 +32,7 @@ public class KafkaService1TopicListener {
 	@KafkaListener(topics = "${topic.name.consumer}", groupId = "group_id")
 	public void consume(ConsumerRecord<String, String> payload) {
 
-		Tracer tracer = GlobalOpenTelemetry.getTracerProvider().get("log-requests");
+		Tracer tracer = GlobalOpenTelemetry.getTracerProvider().get("kafka-service1");
 		Span parentSpan = Span.current();
 		logger.info("=====================================================================================");
 		logger.info("=====================================================================================");
@@ -59,7 +59,7 @@ public class KafkaService1TopicListener {
 			logger.info("consume method called");
 			String arr[] = payload.value().split(",");
 			list.add("Received request for conversion of " + arr[0] + " to " + arr[1]);
-			logRequestsTopicProducer.send(payload.value());
+			kafkaService2TopicProducer.send(payload.value());
 			scope.close();
 		} finally {
 			childSpan.end();
