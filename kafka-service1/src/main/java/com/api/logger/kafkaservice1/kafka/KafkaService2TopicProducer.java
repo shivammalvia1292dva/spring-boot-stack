@@ -18,7 +18,7 @@ public class KafkaService2TopicProducer {
     private KafkaTemplate<String, String> kafkaTemplate;
 
     public void send(String message) {
-        logger.info("Payload message sent to : {}" + message);
+        logger.info("Payload message sent to topic " + topicName + "with values : " + message);
         kafkaTemplate.send(topicName, message);
     }
 

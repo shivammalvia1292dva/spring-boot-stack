@@ -19,49 +19,31 @@ import io.opentelemetry.context.Scope;
 @Service
 public class KafkaService2TopicListener {
 
-    Logger logger = LoggerFactory.getLogger(KafkaService2TopicListener.class);
+   private static Logger logger = LoggerFactory.getLogger(KafkaService2TopicListener.class);
+
     @Value("${topic.name.consumer")
     private String topicName;
 
-    private List<String> list = new ArrayList<>();
-
     @KafkaListener(topics = "${topic.name.consumer}", groupId = "group_id")
     public void consume(ConsumerRecord<String, String> payload) {
-        logger.info("log-request-chain-topic-consumer-called");
-		Tracer tracer = GlobalOpenTelemetry.getTracerProvider().get("log-api-requests-chain");
-		Span parentSpan = Span.current();
-		logger.info("=====================================================================================");
-		logger.info("=====================================================================================");
-		logger.info(parentSpan.getSpanContext().getTraceId());
-		logger.info(parentSpan.getSpanContext().getSpanId());
-		logger.info("" + parentSpan.getSpanContext().isRemote());
-		logger.info("" + parentSpan.getSpanContext().isSampled());
-		logger.info("" + parentSpan.getSpanContext().isValid());
+        logger.info("Inside consume method for KafkaService1");
+        Tracer tracer = GlobalOpenTelemetry.getTracerProvider().get("kafka-service2");
+        Span parentSpan = Span.current();
+        logger.debug(parentSpan.getSpanContext().getTraceId());
+        logger.debug(parentSpan.getSpanContext().getSpanId());
 
 
-		Span childSpan = tracer.spanBuilder("log-api-requests-chain_consume_span").setParent(Context.current().with(parentSpan)).startSpan();
-		logger.info("=====================================================================================");
-		logger.info("=====================================================================================");
-		logger.info(childSpan.getSpanContext().getTraceId());
-		logger.info(childSpan.getSpanContext().getSpanId());
-		logger.info("" + childSpan.getSpanContext().isRemote());
-		logger.info("" + childSpan.getSpanContext().isSampled());
-		logger.info("" + childSpan.getSpanContext().isValid());
-		// Make the span the current span
-		try (Scope scope = childSpan.makeCurrent()) {
-	        logger.info(payload.value());
-	        String arr[] = payload.value().split(",");
-	        
-	        list.add("Received request for conversion of  log-request consumer" + arr[0] + " to " + arr[1]);
-	    	scope.close();	
-		} finally {
-			childSpan.end();
-			parentSpan.end();
-		}
+        Span childSpan = tracer.spanBuilder("kafka-service2-consumer").setParent(Context.current().with(parentSpan)).startSpan();
+        logger.debug(childSpan.getSpanContext().getTraceId());
+        logger.debug(childSpan.getSpanContext().getSpanId());
+        // Make the span the current span
+        try (Scope scope = childSpan.makeCurrent()) {
+            String arr[] = payload.value().split(",");
+            logger.info("Received request for conversion in kafka-service2 " + arr[0] + " to " + arr[1]);
+        } finally {
+            childSpan.end();
+            parentSpan.end();
+        }
 
-    }
-
-    public List<String> getList() {
-        return list;
     }
 }

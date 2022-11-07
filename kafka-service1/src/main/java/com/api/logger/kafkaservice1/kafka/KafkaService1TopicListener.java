@@ -20,54 +20,43 @@ import io.opentelemetry.context.Scope;
 @Service
 public class KafkaService1TopicListener {
 
-	@Autowired
-	private KafkaService2TopicProducer kafkaService2TopicProducer;
+	private static Logger logger = LoggerFactory.getLogger(KafkaService1TopicListener.class);
+    @Autowired
+    private KafkaService2TopicProducer kafkaService2TopicProducer;
 
-	Logger logger = LoggerFactory.getLogger(KafkaService1TopicListener.class);
-	@Value("${topic.name.consumer")
-	private String topicName;
+    @Value("${topic.name.consumer")
+    private String topicName;
 
-	private List<String> list = new ArrayList<>();
+    private List<String> list = new ArrayList<>();
 
-	@KafkaListener(topics = "${topic.name.consumer}", groupId = "group_id")
-	public void consume(ConsumerRecord<String, String> payload) {
+    @KafkaListener(topics = "${topic.name.consumer}", groupId = "group_id")
+    public void consume(ConsumerRecord<String, String> payload) {
+        logger.info("Inside consume method for KafkaService1");
+        Tracer tracer = GlobalOpenTelemetry.getTracerProvider().get("kafka-service1");
+        Span parentSpan = Span.current();
+        logger.debug(parentSpan.getSpanContext().getTraceId());
+        logger.debug(parentSpan.getSpanContext().getSpanId());
 
-		Tracer tracer = GlobalOpenTelemetry.getTracerProvider().get("kafka-service1");
-		Span parentSpan = Span.current();
-		logger.info("=====================================================================================");
-		logger.info("=====================================================================================");
-		logger.info(parentSpan.getSpanContext().getTraceId());
-		logger.info(parentSpan.getSpanContext().getSpanId());
-		logger.info("" + parentSpan.getSpanContext().isRemote());
-		logger.info("" + parentSpan.getSpanContext().isSampled());
-		logger.info("" + parentSpan.getSpanContext().isValid());
+        Span childSpan = tracer.spanBuilder("kafka-service1-consumer").setParent(Context.current().with(parentSpan))
+                .startSpan();
+        logger.debug(childSpan.getSpanContext().getTraceId());
+        logger.debug(childSpan.getSpanContext().getSpanId());
+        try (Scope scope = childSpan.makeCurrent()) {
+            logger.debug(payload.value());
+            logger.debug(payload.headers().toString());
+            payload.headers().forEach(header -> System.out
+                    .println("header key = " + header.key() + " value = " + header.value().toString()));
+            String arr[] = payload.value().split(",");
+            list.add("Received request for conversion of " + arr[0] + " to " + arr[1]);
+            kafkaService2TopicProducer.send(payload.value());
+        } finally {
+            childSpan.end();
+            parentSpan.end();
+        }
+        logger.info("Consume method call finished");
+    }
 
-		Span childSpan = tracer.spanBuilder("log-requests_consume_span").setParent(Context.current().with(parentSpan))
-				.startSpan();
-		logger.info("=====================================================================================");
-		logger.info("=====================================================================================");
-		logger.info(childSpan.getSpanContext().getTraceId());
-		logger.info(childSpan.getSpanContext().getSpanId());
-		logger.info("" + childSpan.getSpanContext().isRemote());
-		logger.info("" + childSpan.getSpanContext().isSampled());
-		logger.info("" + childSpan.getSpanContext().isValid());
-		try (Scope scope = childSpan.makeCurrent()) {
-			logger.info(payload.value());
-			logger.info(payload.headers().toString());
-			payload.headers().forEach(header -> System.out
-					.println("header key = " + header.key() + " value = " + header.value().toString()));
-			logger.info("consume method called");
-			String arr[] = payload.value().split(",");
-			list.add("Received request for conversion of " + arr[0] + " to " + arr[1]);
-			kafkaService2TopicProducer.send(payload.value());
-			scope.close();
-		} finally {
-			childSpan.end();
-			parentSpan.end();
-		}
-	}
-
-	public List<String> getList() {
-		return list;
-	}
+    public List<String> getList() {
+        return list;
+    }
 }
