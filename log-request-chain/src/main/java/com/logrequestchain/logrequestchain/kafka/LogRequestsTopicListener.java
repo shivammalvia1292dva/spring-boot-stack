@@ -39,7 +39,7 @@ public class LogRequestsTopicListener {
 		logger.info("" + parentSpan.getSpanContext().isValid());
 
 
-		Span childSpan = tracer.spanBuilder("LogRequestsTopicListener_consume_span").setParent(Context.current().with(parentSpan)).startSpan();
+		Span childSpan = tracer.spanBuilder("log-api-requests-chain_consume_span").setParent(Context.current().with(parentSpan)).startSpan();
 		logger.info("=====================================================================================");
 		logger.info("=====================================================================================");
 		logger.info(childSpan.getSpanContext().getTraceId());

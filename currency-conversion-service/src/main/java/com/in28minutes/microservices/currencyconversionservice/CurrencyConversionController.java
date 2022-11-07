@@ -39,4 +39,10 @@ public class CurrencyConversionController {
         CurrencyConversion currencyConversion = currencyExchangeProxy.retrieveExchangeValue(from, to);
         return new CurrencyConversion(currencyConversion.getId(), from, to, quantity, currencyConversion.getConversionMultiple(), quantity.multiply(currencyConversion.getConversionMultiple()), currencyConversion.getEnvironment() + "Feign");
     }
+    
+    @GetMapping("currency-conversion-publish/from/{from}/to/{to}/quantity/{quantity}")
+    public String calculateCurrencyConversionPublish(@PathVariable String from, @PathVariable String to, @PathVariable BigDecimal quantity) {
+        curencyExchangeLogTopicProducer.send(from + "," + to);
+        return "ok";
+    }
 }
