@@ -1,6 +1,9 @@
 package com.in28minutes.microservices.currencyconversionservice;
 
 import com.in28minutes.microservices.currencyconversionservice.kafka.CurencyExchangeLogTopicProducer;
+
+import io.micrometer.core.annotation.Timed;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,5 +47,12 @@ public class CurrencyConversionController {
     public String calculateCurrencyConversionPublish(@PathVariable String from, @PathVariable String to, @PathVariable BigDecimal quantity) {
         curencyExchangeLogTopicProducer.send(from + "," + to);
         return "ok";
+    }
+    
+    @Timed(value = "customTimeMetric", description = "Time spent")
+    @GetMapping("/customMetric")
+    public String customMetric() throws InterruptedException{
+    	Thread.sleep(2000);
+    	return "ok";
     }
 }

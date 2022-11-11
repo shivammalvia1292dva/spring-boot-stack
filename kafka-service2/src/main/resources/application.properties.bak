@@ -1,19 +1,23 @@
 
 spring.config.import=optional:configserver:http://localhost:8888
 spring.application.name=kafka-service2
-server.port=8300
+server.port=8004
 
 eureka.client.serviceURL.defaultZone=http://localhost:8761/eureka
 
 #Kafka properties
 # Kafka Consumer properties
-spring.kafka.consumer.bootstrap-servers=host.docker.internal:29092
-#spring.kafka.producer.bootstrap-servers=localhost:9092
+#spring.kafka.consumer.bootstrap-servers=host.docker.internal:29092
+spring.kafka.producer.bootstrap-servers=localhost:9092
 spring.kafka.consumer.group-id=group_id
 spring.kafka.consumer.auto-offset-reset=earliest
 spring.kafka.consumer.key-deserializer=org.apache.kafka.common.serialization.StringDeserializer
 spring.kafka.consumer.value-deserializer=org.apache.kafka.common.serialization.StringDeserializer
+<<<<<<< HEAD:log-request-chain/src/main/resources/application.properties
+topic.name.consumer=log-api-requests-chain
+management.endpoints.web.exposure.include=*
+=======
 topic.name.consumer=kafka-service2-topic
+>>>>>>> bde3c092130bbc52aabebc2abdb200d035976c67:kafka-service2/src/main/resources/application.properties
 
 #spring.sleuth.propagation.type=AWS
-management.endpoints.web.exposure.include=*

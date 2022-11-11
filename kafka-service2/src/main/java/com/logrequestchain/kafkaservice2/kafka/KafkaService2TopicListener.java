@@ -1,8 +1,5 @@
 package com.logrequestchain.kafkaservice2.kafka;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
@@ -33,7 +31,7 @@ public class KafkaService2TopicListener {
         logger.debug(parentSpan.getSpanContext().getSpanId());
 
 
-        Span childSpan = tracer.spanBuilder("kafka-service2-topic-consumer").setParent(Context.current().with(parentSpan)).startSpan();
+        Span childSpan = tracer.spanBuilder("kafka-service2-topic-consumer").setParent(Context.current().with(parentSpan)).setSpanKind(SpanKind.SERVER).startSpan();
         logger.debug(childSpan.getSpanContext().getTraceId());
         logger.debug(childSpan.getSpanContext().getSpanId());
         // Make the span the current span

@@ -2,113 +2,94 @@ version: '3.7'
 
 services:
     currency-exchange:
-      image: shivamec92/mmv2-currency-exchange-service:0.0.1-SNAPSHOT
-      mem_limit: 800m
-      volumes:
-        - ./otel-jar/aws-opentelemetry-agent.jar:/aws-opentelemetry-agent.jar 
+      image: shashitale/exchange-service
+      mem_limit: 800m 
       ports:
        - "8000:8000"
-      networks:
-        - currency-network
       depends_on:
-        - naming-server
+        - aws-ot-collector
       environment:
+        OTEL_EXPORTER_OTLP_ENDPOINT : http://aws-ot-collector:4317
+        OTEL_TRACES_EXPORTER : otlp
         SPRING_KAFKA_BOOTSTRAPSERVERS: kafka:29092
         EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/eureka
-        SPRING.ZIPKIN.BASEURL: http://zipkin-server:9411/
-        JAVA_OPTS: "$JAVA_OPTS -javaagent:/aws-opentelemetry-agent.jar -Dotel.resource.attributes=service.name=CurrencyExchange 
-          -Dotel.exporter=otlp -Dotel.exporter.otlp.endpoint=http://host.docker.internal:4317"
       extra_hosts:
         - "host.docker.internal:host-gateway"
 
-      
     currency-conversion:
-      image: shivamec92/mmv2-currency-conversion-service:0.0.1-SNAPSHOT
+      image: shashitale/currency-conversion
       mem_limit: 700m
-      volumes:
-        - ./otel-jar/aws-opentelemetry-agent.jar:/aws-opentelemetry-agent.jar 
       ports:
        - "8100:8100"
-      networks:
-        - currency-network
       depends_on:
         - naming-server
       environment:
+        OTEL_EXPORTER_OTLP_ENDPOINT : http://aws-ot-collector:4317
+        OTEL_TRACES_EXPORTER : otlp
         SPRING_KAFKA_BOOTSTRAPSERVERS: kafka:29092
-        EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/eureka
-        SPRING.ZIPKIN.BASEURL: http://zipkin-server:9411/
-        JAVA_OPTS: "$JAVA_OPTS -javaagent:/aws-opentelemetry-agent.jar -Dotel.resource.attributes=service.name=CurrencyConversion 
-          -Dotel.exporter=otlp -Dotel.exporter.otlp.endpoint=http://host.docker.internal:4317"
-    
-    log-request-chain:
-      image: shivamec92/mmv2-log-request-chain:0.0.1-SNAPSHOT
+        EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/eureka 
+      extra_hosts:
+        - "host.docker.internal:host-gateway"
+
+    kafka-service2:
+      image: shashitale/kafka-service2
       mem_limit: 700m
-      volumes:
-        - ./otel-jar/aws-opentelemetry-agent.jar:/aws-opentelemetry-agent.jar 
       ports:
-       - "8004:8004"
-      networks:
-        - currency-network
+       - "8300:8300"
       depends_on:
         - naming-server
       environment:
+        OTEL_EXPORTER_OTLP_ENDPOINT : http://aws-ot-collector:4317
+        OTEL_TRACES_EXPORTER : otlp      
         SPRING_KAFKA_BOOTSTRAPSERVERS: kafka:29092
         EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/eureka
-        SPRING.ZIPKIN.BASEURL: http://zipkin-server:9411/
-        JAVA_OPTS: "$JAVA_OPTS -javaagent:/aws-opentelemetry-agent.jar -Dotel.resource.attributes=service.name=LogRequestChain 
-          -Dotel.exporter=otlp -Dotel.exporter.otlp.endpoint=http://host.docker.internal:4317"
           
-    log-requests:
-      image: shivamec92/mmv2-log-requests:0.0.1-SNAPSHOT
+    kafka-service1:
+      image: shashitale/kafka-service1
       mem_limit: 700m
-      volumes:
-        - ./otel-jar/aws-opentelemetry-agent.jar:/aws-opentelemetry-agent.jar 
       ports:
-       - "8003:8003"
-      networks:
-        - currency-network
+       - "8200:8200"
       depends_on:
         - naming-server
       environment:
+        OTEL_EXPORTER_OTLP_ENDPOINT : http://aws-ot-collector:4317
+        OTEL_TRACES_EXPORTER : otlp
         SPRING_KAFKA_BOOTSTRAPSERVERS: kafka:29092
         EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/eureka
-        SPRING.ZIPKIN.BASEURL: http://zipkin-server:9411/
-        JAVA_OPTS: "$JAVA_OPTS -javaagent:/aws-opentelemetry-agent.jar -Dotel.resource.attributes=service.name=LogRequest 
-          -Dotel.exporter=otlp -Dotel.exporter.otlp.endpoint=http://host.docker.internal:4317"
+
     
     api-gateway:
-      image: shivamec92/mmv2-api-gateway:0.0.1-SNAPSHOT
-      mem_limit: 700m
-      volumes:
-        - ./otel-jar/aws-opentelemetry-agent.jar:/aws-opentelemetry-agent.jar 
+      image: shashitale/api-gateway
+      mem_limit: 700m 
       ports:
        - "8765:8765"
-      networks:
-        - currency-network
       depends_on:
         - naming-server
       environment:
+        OTEL_EXPORTER_OTLP_ENDPOINT : http://aws-ot-collector:4317
+        OTEL_TRACES_EXPORTER : otlp      
         SPRING_KAFKA_BOOTSTRAPSERVERS: kafka:29092
         EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/eureka
-        SPRING.ZIPKIN.BASEURL: http://zipkin-server:9411/
-        JAVA_OPTS: "$JAVA_OPTS -javaagent:/aws-opentelemetry-agent.jar -Dotel.resource.attributes=service.name=APIGateway 
-          -Dotel.exporter=otlp -Dotel.exporter.otlp.endpoint=http://host.docker.internal:4317"
-     
+        
+      # ADOT Collector
+    aws-ot-collector:   
+      image: amazon/aws-otel-collector:latest
+      command: ["--config=/etc/otel-agent-config.yaml"]    
+      ports:
+        - "1777:1777"   # pprof extension
+        - "55679:55679" # zpages extension
+        - "13133"
+        - "4317"
+        - "4318"
+      environment:
+        - AWS_ACCESS_KEY_ID=AKIASTIULDUMKBICBUUU
+        - AWS_SECRET_ACCESS_KEY=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
+        - AWS_REGION=us-west-2
+      volumes:
+        - ./config-test.yaml:/etc/otel-agent-config.yaml
+    
     naming-server:
       image: shivamec92/mmv2-naming-server:0.0.1-SNAPSHOT
       mem_limit: 700m
       ports:
        - "8761:8761"
-      networks:
-        - currency-network
-        
-    zipkin-server:
-      image: openzipkin/zipkin:2.23
-      mem_limit: 700m
-      ports:
-       - "9411:9411"
-      networks:
-        - currency-network
-        
-networks:
-  currency-network:

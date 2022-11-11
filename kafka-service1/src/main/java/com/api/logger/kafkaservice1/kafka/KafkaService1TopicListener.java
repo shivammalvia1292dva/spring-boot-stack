@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
@@ -37,7 +38,7 @@ public class KafkaService1TopicListener {
         logger.debug(parentSpan.getSpanContext().getTraceId());
         logger.debug(parentSpan.getSpanContext().getSpanId());
 
-        Span childSpan = tracer.spanBuilder("kafka-service1-topic-consumer").setParent(Context.current().with(parentSpan))
+        Span childSpan = tracer.spanBuilder("kafka-service1-consumer").setParent(Context.current().with(parentSpan)).setSpanKind(SpanKind.SERVER)
                 .startSpan();
         logger.debug(childSpan.getSpanContext().getTraceId());
         logger.debug(childSpan.getSpanContext().getSpanId());
