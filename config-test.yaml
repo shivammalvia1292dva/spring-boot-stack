@@ -1,0 +1,75 @@
+extensions:
+  health_check:
+  pprof:
+    endpoint: 0.0.0.0:1777
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 
+      http:
+        endpoint:
+  prometheus:
+    config:
+      scrape_configs:
+        - job_name: "currency-exchange"
+          scrape_interval: 30s
+          metrics_path: '/actuator/prometheus'
+          static_configs:
+            - targets: ["currency-exchange:8000"]
+          metric_relabel_configs:
+          - source_labels: [__name__]
+            regex: '(system_cpu_usage|http_server_requests_seconds_count|http_server_requests_seconds_sum)'
+            action: keep  
+        - job_name: "currency-conversion"
+          scrape_interval: 30s
+          metrics_path: '/actuator/prometheus'
+          static_configs:
+            - targets: ["currency-conversion:8100"]
+          metric_relabel_configs:
+          - source_labels: [__name__]
+            regex: '(system_cpu_usage|http_server_requests_seconds_count|http_server_requests_seconds_sum|customTimeMetric_seconds_count|customTimeMetric_seconds_max|customTimeMetric_seconds_sum)'
+            action: keep   
+        - job_name: "kafka-service1"
+          scrape_interval: 30s
+          metrics_path: '/actuator/prometheus'
+          static_configs:
+            - targets: ["kafka-service1:8200"]
+          metric_relabel_configs:
+          - source_labels: [__name__]
+            regex: '(system_cpu_usage|http_server_requests_seconds_count|http_server_requests_seconds_sum)'
+            action: keep 
+        - job_name: "kafka-service2"
+          scrape_interval: 30s
+          metrics_path: '/actuator/prometheus'
+          static_configs:
+            - targets: ["kafka-service2:8300"]
+          metric_relabel_configs:
+          - source_labels: [__name__]
+            regex: '(system_cpu_usage|http_server_requests_seconds_count|http_server_requests_seconds_sum)'
+            action: keep      
+         
+processors:
+  batch:
+
+exporters:
+  logging:
+    loglevel: debug
+  awsxray:
+    region: 'us-west-2'
+  awsemf:
+    region: 'us-west-2'
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [logging,awsxray]
+    metrics:
+      receivers: [prometheus]
+      exporters: [logging,awsemf]
+
+  extensions: [pprof]
+  telemetry:
+    logs:
+      level: debug

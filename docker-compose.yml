@@ -11,6 +11,7 @@ services:
       environment:
         OTEL_EXPORTER_OTLP_ENDPOINT : http://aws-ot-collector:4317
         OTEL_TRACES_EXPORTER : otlp
+        OTEL_METRICS_EXPORTER : prometheus        
         SPRING_KAFKA_BOOTSTRAPSERVERS: kafka:29092
         EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/eureka
       extra_hosts:
@@ -26,6 +27,7 @@ services:
       environment:
         OTEL_EXPORTER_OTLP_ENDPOINT : http://aws-ot-collector:4317
         OTEL_TRACES_EXPORTER : otlp
+        OTEL_METRICS_EXPORTER : prometheus
         SPRING_KAFKA_BOOTSTRAPSERVERS: kafka:29092
         EUREKA.CLIENT.SERVICEURL.DEFAULTZONE: http://naming-server:8761/eureka 
       extra_hosts:
@@ -82,9 +84,9 @@ services:
         - "4317"
         - "4318"
       environment:
-        - AWS_ACCESS_KEY_ID=AKIASTIULDUMKBICBUUU
-        - AWS_SECRET_ACCESS_KEY=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
-        - AWS_REGION=us-west-2
+        - AWS_ACCESS_KEY_ID=AWS_ACCESS_KEY_ID
+        - AWS_SECRET_ACCESS_KEY=AWS_SECRET_ACCESS_KEY
+        - AWS_REGION=AWS_REGION
       volumes:
         - ./config-test.yaml:/etc/otel-agent-config.yaml
     
